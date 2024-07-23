@@ -7,11 +7,14 @@
 #include <unistd.h>
 
 int main(void){
-	printf("Hi");
+	printf("\n");
 	//Flush buffer immediately
-	fflush(stdout);	
-	sleep(1);
-	printf("Bye");
+	for(int i = 0; i < 35; i++){
+		printf("=");
+		fflush(stdout);
+		usleep(1000000);
+	}
+	printf("\n");
 }
 
 
