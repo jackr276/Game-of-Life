@@ -7,6 +7,9 @@ if [[ ! -d ./out ]]; then
 	mkdir out
 fi
 
-gcc -Wall -Wextra ./src/entry_point.c -o ./out/entry_point
+# Clean out whatever already exists in here
+rm -r out/*
 
-./out/entry_point
+gcc -Wall -Wextra ./src/main.c -o ./out/main
+
+./out/main
