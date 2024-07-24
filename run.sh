@@ -10,6 +10,7 @@ fi
 # Clean out whatever already exists in here
 rm -r out/*
 
-gcc -Wall -Wextra ./src/main.c -o ./out/main
+# IMPORTANT -- never experienced this with gcc, but the link for ncurses must come at the end
+gcc -o ./out/main -Wall -Wextra ./src/main.c -lncurses  
 
 ./out/main
