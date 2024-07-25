@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 //Ncurses library for our terminal display
 #include <ncurses.h>
 #include "life/life.h"
@@ -13,6 +14,7 @@ int main(void){
 	initscr();
 
 	printf("I work\n");
+	sleep(2);
 	refresh();
 
 	//End the Ncursers mode
