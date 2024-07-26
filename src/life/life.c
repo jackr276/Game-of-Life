@@ -5,5 +5,13 @@
 
 #include "life.h"
 
+void start_game(short rows, short cols){
+}
 
+Grid* initialize_grid(const short rows, const short cols){
+	return (Grid*)calloc(sizeof(Grid), 4);
+}
 
+void next_tick(){
+
+}

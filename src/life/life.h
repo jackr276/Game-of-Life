@@ -6,11 +6,15 @@
 #ifndef LIFE_H
 #define LIFE_H
 
+#include <stdlib.h>
+
+typedef unsigned char byte;
+
 /**
  * The cell is the building block for the entire GoL
  */
 typedef struct {
-	short is_alive;
+	byte is_alive;
 } Cell;
 
 
@@ -26,7 +30,7 @@ typedef struct{
 
 
 void start_game(const short rows, const short cols);
-Grid* initialize_grid(short N);
+Grid* initialize_grid(const short rows, const short cols);
 void next_tick();
 void draw_grid(Grid* grid);
 void end_game();

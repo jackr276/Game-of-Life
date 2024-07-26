@@ -3,18 +3,18 @@
  * This is the entry point for the game of life terminal display
  */
 
-#include <stdio.h>
 #include <unistd.h>
 //Ncurses library for our terminal display
 #include <ncurses.h>
 #include "life/life.h"
 
+
 int main(void){
 	//Initialize ncurses
 	initscr();
+	
+	start_game(LINES, COLS);
 
-	printf("I work\n");
-	sleep(2);
 	refresh();
 
 	//End the Ncursers mode
