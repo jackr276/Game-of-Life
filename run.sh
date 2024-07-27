@@ -11,6 +11,6 @@ fi
 rm -r out/*
 
 # IMPORTANT -- never experienced this with gcc, but the link for ncurses must come at the end
-gcc -o ./out/main -Wall -Wextra ./src/main.c -lncurses  
+gcc -o ./out/main -Wall -Wextra ./src/main.c ./src/life/life.c -lncurses  
 
 ./out/main

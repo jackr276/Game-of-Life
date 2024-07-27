@@ -5,13 +5,23 @@
 
 #include "life.h"
 
-void start_game(short rows, short cols){
+void start_game(const short rows, const short cols){
+	initscr();
+	
 }
 
-Grid* initialize_grid(const short rows, const short cols){
-	return (Grid*)calloc(sizeof(Grid), 4);
+Grid* initialize_grid(short rows, short cols){
+	Grid generated;
+	generated.rows = rows;
+	generated.cols = cols;
+
 }
 
 void next_tick(){
 
+}
+
+
+void end_game(){
+	endwin();
 }

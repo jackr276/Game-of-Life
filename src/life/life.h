@@ -7,6 +7,7 @@
 #define LIFE_H
 
 #include <stdlib.h>
+#include <ncurses.h>
 
 typedef unsigned char byte;
 
@@ -23,14 +24,14 @@ typedef struct {
  * due to the rules of C static array declarations
  */
 typedef struct{
-	const short rows;
-	const short cols;
+	short rows;
+	short cols;
 	Cell** cells;
 } Grid;
 
 
-void start_game(const short rows, const short cols);
-Grid* initialize_grid(const short rows, const short cols);
+void start_game(short rows, short cols);
+Grid* initialize_grid(short rows, short cols);
 void next_tick();
 void draw_grid(Grid* grid);
 void end_game();
