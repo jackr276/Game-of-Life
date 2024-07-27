@@ -4,12 +4,12 @@
  */
 
 #include <unistd.h>
-//Ncurses library for our terminal display
 #include "life/life.h"
 
 
 int main(void){
-
+	start_game(40, 60);
+	end_game();
 	
 
 	return 0;
