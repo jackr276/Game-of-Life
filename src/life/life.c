@@ -1,11 +1,19 @@
 /**
  * Author: Jack Robbins
- * This is the implementation file for the header file, life.c
+ * 
+ * This header file contains all of the method needed to maintain the game state
+ * for the Game of Life
  */
 
 #include "life.h"
+#include <ncurses.h>
+#include <string.h>
 
 
+/**
+ * This function will initialize a grid and return a reference to a heap allocated grid structure.
+ * NOTE: It is the responbility of the recipient to free this memory
+ */
 static Grid* _initialize_grid(short rows, short cols){
 	//Initialize space for the grid
 	Grid* generated = (Grid*)malloc(sizeof(Grid));
@@ -27,7 +35,10 @@ static Grid* _initialize_grid(short rows, short cols){
 }
 
 
-
+/**
+ * This is a simple function that will destroy a grid for us
+ * NOTE: we use a double pointer here because we set this address to NULL.
+ */
 static void _teardown_grid(Grid** grid){
 	//First we must teardown the internal 2D array
 	for(int i = 0; i < (*grid)->rows; i++){
@@ -55,17 +66,62 @@ void test(){
 	}
 }
 
-
-void start_game(const short rows, const short cols){
-	initscr();
-	test();	
-}
-
-void next_tick(){
-
-}
-
-
-void end_game(){
+void _end_game(){
 	endwin();
+}
+
+void run_game(const short rows, const short cols){
+	//Initialize the screen into ncurses mode
+	initscr();
+
+	//Raw mode, <CTRL-C> won't quit
+	raw();
+
+	//Don't show keys on the screen
+	noecho();
+
+	//Make the cursor invisible
+	curs_set(0);
+
+	//We just initialize this as null for right now
+	char user_input = '\0';
+
+	//Game startup mode, we only move forward once some key is pressed
+	printw("<Press any key to begin>");	
+	//Print this to the screen
+	refresh();
+
+	user_input = getch();
+	clear();
+
+	//We don't want to wait for user input, so set up this no delay
+	nodelay(stdscr, 1);
+
+	printw("Press <q> to quit at any time");
+
+	//Refresh user input in the rare event they enterred 'q' first
+	user_input = '\0';	
+
+	int i = 1;
+	//Here is the main game loop that we have here
+	while(user_input != 'q'){
+		test();
+		printw("Iter %d\n", i);
+		i++;
+		refresh();
+		user_input = getch();
+	}
+	
+	//If we get here, we know that it is time to terminate our game method
+	_end_game();
+}
+
+
+/**
+ * The next tick function will 
+ */
+Grid* next_tick(Grid* current){
+	//Initialize the next grid
+	Grid* next_grid = _initialize_grid(current->rows, current->cols);
+
 }

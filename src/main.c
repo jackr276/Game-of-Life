@@ -8,9 +8,6 @@
 
 
 int main(void){
-	start_game(40, 60);
-	end_game();
-	
-
+	run_game(LINES, COLS);	
 	return 0;
 }

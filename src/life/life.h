@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <unistd.h>
+#include <string.h>
 
 typedef unsigned char byte;
 
@@ -23,9 +24,8 @@ typedef struct{
 } Grid;
 
 
-void start_game(short rows, short cols);
-void next_tick();
+void run_game(short rows, short cols);
+Grid* next_tick(Grid* grid);
 void draw_grid(Grid* grid);
-void end_game();
 
 #endif
