@@ -145,7 +145,7 @@ void run_game(const short rows, const short cols){
 	//We don't want to wait for user input, so set up this no delay
 	nodelay(stdscr, 1);
 
-	printw("Press <q> to quit at any time");
+	printw("Press <q> to quit at any time\n");
 
 	//Refresh user input in the rare event they enterred 'q' first
 	user_input = '\0';	
