@@ -8,6 +8,7 @@
 #include "life.h"
 #include <ncurses.h>
 #include <string.h>
+#include <unistd.h>
 
 
 /**
@@ -66,6 +67,57 @@ void test(){
 	}
 }
 
+
+void _print_welcome(){
+	const char title[] = "                                                                                                                                                                                            \n\
+                                                                                                                                                                                                                \n\
+\t        GGGGGGGGGGGGG                                                                        OOOOOOOOO         ffffffffffffffff       LLLLLLLLLLL               iiii      ffffffffffffffff                      \n\
+\t     GGG::::::::::::G                                                                      OO:::::::::OO      f::::::::::::::::f      L:::::::::L              i::::i    f::::::::::::::::f                     \n\
+\t   GG:::::::::::::::G                                                                    OO:::::::::::::OO   f::::::::::::::::::f     L:::::::::L               iiii    f::::::::::::::::::f                    \n\
+\t  G:::::GGGGGGGG::::G                                                                   O:::::::OOO:::::::O  f::::::fffffff:::::f     LL:::::::LL                       f::::::fffffff:::::f                    \n\
+\t G:::::G       GGGGGG  aaaaaaaaaaaaa      mmmmmmm    mmmmmmm       eeeeeeeeeeee         O::::::O   O::::::O  f:::::f       ffffff       L:::::L               iiiiiii   f:::::f       ffffff    eeeeeeeeeeee    \n\
+\tG:::::G                a::::::::::::a   mm:::::::m  m:::::::mm   ee::::::::::::ee       O:::::O     O:::::O  f:::::f                    L:::::L               i:::::i   f:::::f               ee::::::::::::ee  \n\
+\tG:::::G                aaaaaaaaa:::::a m::::::::::mm::::::::::m e::::::eeeee:::::ee     O:::::O     O:::::O f:::::::ffffff              L:::::L                i::::i  f:::::::ffffff        e::::::eeeee:::::ee\n\
+\tG:::::G    GGGGGGGGGG           a::::a m::::::::::::::::::::::me::::::e     e:::::e     O:::::O     O:::::O f::::::::::::f              L:::::L                i::::i  f::::::::::::f       e::::::e     e:::::e\n\
+\tG:::::G    G::::::::G    aaaaaaa:::::a m:::::mmm::::::mmm:::::me:::::::eeeee::::::e     O:::::O     O:::::O f::::::::::::f              L:::::L                i::::i  f::::::::::::f       e:::::::eeeee::::::e\n\
+\tG:::::G    GGGGG::::G  aa::::::::::::a m::::m   m::::m   m::::me:::::::::::::::::e      O:::::O     O:::::O f:::::::ffffff              L:::::L                i::::i  f:::::::ffffff       e:::::::::::::::::e \n\
+\tG:::::G        G::::G a::::aaaa::::::a m::::m   m::::m   m::::me::::::eeeeeeeeeee       O:::::O     O:::::O  f:::::f                    L:::::L                i::::i   f:::::f             e::::::eeeeeeeeeee  \n\
+\t G:::::G       G::::Ga::::a    a:::::a m::::m   m::::m   m::::me:::::::e                O::::::O   O::::::O  f:::::f                    L:::::L         LLLLLL i::::i   f:::::f             e:::::::e           \n\
+\t  G:::::GGGGGGGG::::Ga::::a    a:::::a m::::m   m::::m   m::::me::::::::e               O:::::::OOO:::::::O f:::::::f                 LL:::::::LLLLLLLLL:::::Li::::::i f:::::::f            e::::::::e          \n\
+\t   GG:::::::::::::::Ga:::::aaaa::::::a m::::m   m::::m   m::::m e::::::::eeeeeeee        OO:::::::::::::OO  f:::::::f                 L::::::::::::::::::::::Li::::::i f:::::::f             e::::::::eeeeeeee  \n\
+\t     GGG::::::GGG:::G a::::::::::aa:::am::::m   m::::m   m::::m  ee:::::::::::::e          OO:::::::::OO    f:::::::f                 L::::::::::::::::::::::Li::::::i f:::::::f              ee:::::::::::::e  \n\
+\t        GGGGGG   GGGG  aaaaaaaaaa  aaaammmmmm   mmmmmm   mmmmmm    eeeeeeeeeeeeee            OOOOOOOOO      fffffffff                 LLLLLLLLLLLLLLLLLLLLLLLLiiiiiiii fffffffff                eeeeeeeeeeeeee  \n\
+                                                                                                                                                                                                                \n\
+                                                                                                                                                                                                                \n\
+                                                                                                                                                                                                                \n\
+                                                                                                                                                                                                                ";
+ 
+	//Move 15 lines down or so to print our little graphic
+	move(15, 0);
+
+	//Print the title to the console
+	printw(title);
+	
+	//Actually make it display
+	refresh();
+
+	//Print out credit
+	move(36, COLS / 2 - 10);
+	printw("Author: Jack Robbins\n");
+	refresh();
+
+	//Wait to let the user admire
+	sleep(2);
+
+	//Center this nicely
+	move(46, COLS / 2 - 13);
+	printw("<Press any key to continue>\n");
+	refresh();
+
+	getch();
+
+}
+
 void _end_game(){
 	endwin();
 }
@@ -80,18 +132,14 @@ void run_game(const short rows, const short cols){
 	//Don't show keys on the screen
 	noecho();
 
-	//Make the cursor invisible
 	curs_set(0);
 
 	//We just initialize this as null for right now
 	char user_input = '\0';
 
 	//Game startup mode, we only move forward once some key is pressed
-	printw("<Press any key to begin>");	
-	//Print this to the screen
-	refresh();
+	_print_welcome();
 
-	user_input = getch();
 	clear();
 
 	//We don't want to wait for user input, so set up this no delay
@@ -124,4 +172,5 @@ Grid* next_tick(Grid* current){
 	//Initialize the next grid
 	Grid* next_grid = _initialize_grid(current->rows, current->cols);
 
+	return next_grid;
 }
