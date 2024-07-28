@@ -159,8 +159,56 @@ static Grid* _get_random_start(const int rows, const int cols){
 	return grid;
 }
 
+
+/**
+ * Everything in the game of life revolves around how many neighbors a cell has. Because of this, the number of neighbors
+ * is the most critical part of our game
+ */
+static int _num_neighbors(byte** grid, const int rows, const int cols, const int cell_row, const int cell_col){
+	int num_neighbors = 0;
+
+	/**
+	* We need to check all of the 8 neighboring cells to this cell, just to give a visual:
+	*                         1 2 3
+	*                         4 * 5
+	*                         6 7 8
+	* In order to effectively count how many neighbors there are
+	*
+	* NOTE: If we go out of bounds of the grid, we will treat that cell as dead
+	*/
+
+	//Check top left, if it is valid. If it isn't valid, we'll just be adding 0 here, so we don't need an else
+	if(cell_row - 1 >= 0 && cell_col - 1 >= 0){
+		//We'll just add what we have here -- remember 1 = alive, 0 = dead
+		num_neighbors += grid[cell_row - 1][cell_col - 1];
+	}
+
+	//Check directly above, if it is valid. Again if it isn't we treat it as dead
+	if(cell_row - 1 >= 0){
+		num_neighbors += grid[cell_row - 1][cell_col];
+	}
+
+	//Check to the top right, if it is valid. If not treat it as dead	
+	if(cell_row - 1 >= 0 && cell_col + 1 < cols){
+		num_neighbors += grid[cell_row - 1][cell_col + 1];
+	}
+
+	//TODO finish the rest of these
+
+	return num_neighbors;
+}
+
+
 static Grid* _next_tick(Grid* previous){
-	Grid* next_gen = _get_random_start(previous->rows, previous->cols);
+	//Make a new grid
+	Grid* next_gen = _initialize_grid(previous->rows, previous->cols);
+
+	int num_neighbors;
+	for(int i = 0; i < previous->rows; i++)	{
+		for(int j = 0; j < previous->cols; j++){
+			num_neighbors = _num_neighbors(previous->cells, previous->rows, previous->cols, i, j);	
+		}
+	}
 
 
 
