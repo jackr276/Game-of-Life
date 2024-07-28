@@ -7,10 +7,6 @@
  */
 
 #include "life.h"
-#include <ncurses.h>
-#include <unistd.h>
-#include <wchar.h>
-
 
 /**
  * This function will initialize a grid and return a reference to a heap allocated grid structure.
@@ -41,20 +37,17 @@ static Grid* _initialize_grid(const int rows, const int cols){
  * This is a simple function that will destroy a grid for us
  * NOTE: we use a double pointer here because we set this address to NULL.
  */
-static void _teardown_grid(Grid** grid){
+static void _teardown_grid(Grid* grid){
 	//First we must teardown the internal 2D array
-	for(int i = 0; i < (*grid)->rows; i++){
-		free((*grid)->cells[i]);
+	for(int i = 0; i < grid->rows; i++){
+		free(grid->cells[i]);
 	}
 
 	//Free the cells pointer
-	free((*grid)->cells);
+	free(grid->cells);
 
 	//Finally free the grid pointer
-	free(*grid);
-
-	//Set to null as a warning that this is now empty
-	*grid = NULL;
+	free(grid);
 }
 
 
@@ -146,13 +139,6 @@ static void _display_grid(Grid* grid){
 }
 
 
-static Grid* _next_tick(Grid* previous){
-	Grid* next_gen = _initialize_grid(previous->rows, previous->cols);
-
-	return next_gen;
-}
-
-
 /**
  * Get a random starting point. In theory, this should be pretty sparse with about less than half being
  * alive. This may be changed later
@@ -173,6 +159,17 @@ static Grid* _get_random_start(const int rows, const int cols){
 	return grid;
 }
 
+static Grid* _next_tick(Grid* previous){
+	Grid* next_gen = _get_random_start(previous->rows, previous->cols);
+
+
+
+	//Free up all the memory of the previous grid
+	_teardown_grid(previous);
+	return next_gen;
+}
+
+
 
 void run_game(){	
 	//Initialize the screen into ncurses mode
@@ -181,7 +178,8 @@ void run_game(){
 	//If the terminal is the wrong size, we'll just quit and tell the user to retry
 	if(LINES < 52 || COLS < 224){
 		//Print a nice error
-		printw("\n==============================================================================================================================\n");
+		move(LINES / 2 - 3, 0);
+		printw("==============================================================================================================================\n");
 		printw("Display Error: Terminal Window must be at least 52 lines tall by 224 columns wide for proper display. Please resize and retry.\n");
 		printw("==============================================================================================================================\n\n");
 
@@ -243,8 +241,7 @@ void run_game(){
 		sleep(1);
 		
 		//Get the next grid
-		current = _get_random_start(rows, cols);				
-
+		current = _next_tick(current);
 		//Grab the user input
 		user_input = getch();
 		generation++;
