@@ -6,18 +6,13 @@
  */
 
 #include "life.h"
-#include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 
 /**
  * This function will initialize a grid and return a reference to a heap allocated grid structure.
  * NOTE: It is the responbility of the recipient to free this memory
  */
-static Grid* _initialize_grid(short rows, short cols){
+static Grid* _initialize_grid(const int rows, const int cols){
 	//Initialize space for the grid
 	Grid* generated = (Grid*)malloc(sizeof(Grid));
 
@@ -70,7 +65,7 @@ void test(){
 }
 
 
-void _print_welcome(){
+static void _print_welcome(){
 	const char title[] = "                                                                                                                                                                                            \n\
                                                                                                                                                                                                                 \n\
 \t\t        GGGGGGGGGGGGG                                                                        OOOOOOOOO         ffffffffffffffff       LLLLLLLLLLL               iiii      ffffffffffffffff                      \n\
@@ -120,7 +115,7 @@ void _print_welcome(){
 
 }
 
-void _end_game(){
+static void _end_game(){
 	//Wipe the screen clean
 	clear();
 	
@@ -130,13 +125,37 @@ void _end_game(){
 	refresh();
 
 	//Let the user read it
-	sleep(3);
+	sleep(2);
 
 
 	//End ncurses mode and hard exit the program
 	endwin();	
 	exit(0);
 }
+
+
+static Grid* _next_tick(Grid* previous){
+	Grid* next_gen = _initialize_grid(previous->rows, previous->cols);
+
+	return next_gen;
+}
+
+static Grid* _get_random_start(const int rows, const int cols){
+	//Create a fresh grid
+	Grid* grid = _initialize_grid(rows, cols);
+
+	//Randomly populate this grid
+	for(int i = 0; i < rows; i++){
+		for(int j = 0; j < cols; j++){
+			//We want this to be kind of sparse at first, initial idea is we only populate with a 1 if we can divide by 3
+			grid->cells[i][j] = (rand() % 3 != 0) ? 0 : 1; 
+		}
+	}
+
+	//And that's all, our grid should be randomly populated now
+	return grid;
+}
+
 
 void run_game(){	
 	//Initialize the screen into ncurses mode
@@ -145,7 +164,7 @@ void run_game(){
 	//If the terminal is the wrong size, we'll just quit and tell the user to retry
 	if(LINES < 52 || COLS < 224){
 		//Print a nice error
-		printw("\n=============================================================================================================================\n");
+		printw("\n==============================================================================================================================\n");
 		printw("Display Error: Terminal Window must be at least 52 lines tall by 224 columns wide for proper display. Please resize and retry.\n");
 		printw("==============================================================================================================================\n\n");
 
@@ -160,12 +179,17 @@ void run_game(){
 		exit(1);
 	}
 
+	//We will now save the rows and columns as constants
+	const int rows = LINES;
+	const int cols = COLS;
+
 	//Raw mode, <CTRL-C> won't quit
 	raw();
 
 	//Don't show keys on the screen
 	noecho();
 
+	//Put the cursor in invisible mode
 	curs_set(0);
 
 	//We just initialize this as null for right now
@@ -174,37 +198,34 @@ void run_game(){
 	//Game startup mode, we only move forward once some key is pressed
 	_print_welcome();
 
+	//Wipe the screen
 	clear();
 
 	//We don't want to wait for user input, so set up this no delay
 	nodelay(stdscr, 1);
 
 	printw("Press <q> to quit at any time\n");
+	refresh();
 
 	//Refresh user input in the rare event they enterred 'q' first
 	user_input = '\0';	
 
-	int i = 1;
-	//Here is the main game loop that we have here
+	//We will keep track of the "generations of the game"
+	int generation = 1;
+
+	//Keep track of the current grid
+	Grid* current = _get_random_start(rows, cols);
+
+	//Main game loop, while the user lets it go, we will run forever
+	//Idea of the main loop: Display -> wait -> get next & repeat
 	while(user_input != 'q'){
+						
 		test();
-		printw("Iter %d\n", i);
-		i++;
 		refresh();
 		user_input = getch();
+		generation++;
 	}
 	
 	//If we get here, we know that it is time to terminate our game method
 	_end_game();
-}
-
-
-/**
- * The next tick function will 
- */
-Grid* next_tick(Grid* current){
-	//Initialize the next grid
-	Grid* next_grid = _initialize_grid(current->rows, current->cols);
-
-	return next_grid;
 }
