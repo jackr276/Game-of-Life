@@ -1,11 +1,15 @@
 /**
  * Author: Jack Robbins
  * 
- * This header file contains all of the method needed to maintain the game state
- * for the Game of Life
+ * This c file is the guts of the whole thing. From here we handle displaying and running the game of life. It is notable
+ * that most functions here are static, which is C's way of making them effectively private, because no other external function
+ * should be calling them
  */
 
 #include "life.h"
+#include <ncurses.h>
+#include <unistd.h>
+#include <wchar.h>
 
 
 /**
@@ -51,17 +55,6 @@ static void _teardown_grid(Grid** grid){
 
 	//Set to null as a warning that this is now empty
 	*grid = NULL;
-}
-
-
-// DELETEME once done testing
-void test(){
-	Grid* grid;
-	for(int i = 0; i < 200; i++){
-		grid = _initialize_grid(500, 600);
-		usleep(100);
-		_teardown_grid(&grid);
-	}
 }
 
 
@@ -115,6 +108,7 @@ static void _print_welcome(){
 
 }
 
+
 static void _end_game(){
 	//Wipe the screen clean
 	clear();
@@ -134,12 +128,35 @@ static void _end_game(){
 }
 
 
+static void _display_grid(Grid* grid){
+	//Go through every cell
+	for(int i = 0; i < grid->rows; i++){
+		//Move the cursor down to be at the ith row
+		move(i, 0);
+			
+		//Print a # if occupied, nothing if not
+		for(int j = 0; j < grid->cols; j++){
+			printw(grid->cells[i][j] ? "#" : " ");
+		}
+		printw("\n");
+	}
+
+	//Make this show on the screen
+	refresh();
+}
+
+
 static Grid* _next_tick(Grid* previous){
 	Grid* next_gen = _initialize_grid(previous->rows, previous->cols);
 
 	return next_gen;
 }
 
+
+/**
+ * Get a random starting point. In theory, this should be pretty sparse with about less than half being
+ * alive. This may be changed later
+ */
 static Grid* _get_random_start(const int rows, const int cols){
 	//Create a fresh grid
 	Grid* grid = _initialize_grid(rows, cols);
@@ -207,21 +224,28 @@ void run_game(){
 	printw("Press <q> to quit at any time\n");
 	refresh();
 
-	//Refresh user input in the rare event they enterred 'q' first
+	//Refresh user input in the rare event they entered 'q' first
 	user_input = '\0';	
 
 	//We will keep track of the "generations of the game"
 	int generation = 1;
-
-	//Keep track of the current grid
+	
+	//Initially the first grid is a random one
 	Grid* current = _get_random_start(rows, cols);
-
+	
 	//Main game loop, while the user lets it go, we will run forever
 	//Idea of the main loop: Display -> wait -> get next & repeat
 	while(user_input != 'q'){
-						
-		test();
-		refresh();
+		//Display the grid
+		_display_grid(current);
+
+		//Wait 1 second
+		sleep(1);
+		
+		//Get the next grid
+		current = _get_random_start(rows, cols);				
+
+		//Grab the user input
 		user_input = getch();
 		generation++;
 	}
