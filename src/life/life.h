@@ -24,7 +24,7 @@ typedef struct{
 } Grid;
 
 
-void run_game(short rows, short cols);
+void run_game();
 Grid* next_tick(Grid* grid);
 void draw_grid(Grid* grid);
 

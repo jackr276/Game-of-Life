@@ -8,6 +8,6 @@
 
 
 int main(void){
-	run_game(LINES, COLS);	
+	run_game();	
 	return 0;
 }
