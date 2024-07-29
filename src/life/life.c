@@ -166,6 +166,8 @@ static Grid* _get_random_start(const int rows, const int cols){
  */
 static int _num_living_neighbors(byte** grid, const int rows, const int cols, const int cell_row, const int cell_col){
 	int num_neighbors = 0;
+	int neighbor_row;
+	int neighbor_col;
 
 	/**
 	* We need to check all of the 8 neighboring cells to this cell, just to give a visual:
@@ -174,49 +176,140 @@ static int _num_living_neighbors(byte** grid, const int rows, const int cols, co
 	*                         6 7 8
 	* In order to effectively count how many neighbors there are
 	*
-	* NOTE: If we go out of bounds of the grid, we will treat that cell as dead
+	* NOTE: If we go out of bounds of the grid, we will simply wrap around in whatever direction is appropriate
 	*/
 
-	//Check top left, if it is valid. If it isn't valid, we'll just be adding 0 here, so we don't need an else
-	if(cell_row - 1 >= 0 && cell_col - 1 >= 0){
-		//We'll just add what we have here -- remember 1 = alive, 0 = dead
-		num_neighbors += grid[cell_row - 1][cell_col - 1];
-	}
-
-	//Check directly above, if it is valid. Again if it isn't we treat it as dead
+	//TOP LEFT
+	//Decide which row coordinates to use
+	//If we underflow, we'll rap around
 	if(cell_row - 1 >= 0){
-		num_neighbors += grid[cell_row - 1][cell_col];
+		neighbor_row = cell_row - 1;
+	} else {
+		neighbor_row = rows - 1;
 	}
 
-	//Check to the top right, if it is valid. If not treat it as dead	
-	if(cell_row - 1 >= 0 && cell_col + 1 < cols){
-		num_neighbors += grid[cell_row - 1][cell_col + 1];
-	}
-
-	//Check directly to the left
+	//Decide which col coordinates to use
 	if(cell_col - 1 >= 0){
-		num_neighbors += grid[cell_row][cell_col - 1];
+		neighbor_col = cell_col - 1;
+	} else {
+		neighbor_col = cols - 1;
 	}
 
-	//Check directly to the right
+	//We'll just add what we have here -- remember 1 = alive, 0 = dead
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//ABOVE
+	//Check directly above, column is the same here
+	neighbor_col = cell_col;
+
+	//Again if we underflow the rows just wrap around
+	if(cell_row - 1 >= 0){
+		neighbor_row = cell_row - 1;
+	} else {
+		neighbor_row = rows - 1;	
+	}
+
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//TOP RIGHT
+	//Check to the top right, if it is valid. If not treat it as dead	
+	//If we underflow, we'll rap around
+	if(cell_row - 1 >= 0){
+		neighbor_row = cell_row - 1;
+	} else {
+		neighbor_row = rows - 1;
+	}
+
+	//If we overflow columns, we'll also wrap around
 	if(cell_col + 1 < cols){
-		num_neighbors += grid[cell_row][cell_col + 1];
+		neighbor_col = cell_col + 1;
+	} else {
+		neighbor_col = 0;
 	}
 
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//LEFT
+	//Check directly to the left, row is the same
+	neighbor_row = cell_row;
+	
+	//If we underflow wrap around
+	if(cell_col - 1 >= 0){
+		neighbor_col = cell_col - 1;
+	} else {
+		neighbor_col = cols - 1;
+	}
+
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//RIGHT
+	//Check directly to the right, row is the same
+	neighbor_row = cell_row;
+
+	//If we overflow the columns
+	if(cell_col + 1 < cols){
+		neighbor_col = cell_col + 1;
+	} else {
+		neighbor_col = 0;
+	}
+
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//BOTTOM LEFT
 	//Check to the bottom left
-	if(cell_row + 1 < rows && cell_col - 1 >= 0){
-		num_neighbors += grid[cell_row + 1][cell_col - 1];
-	}
-
-	//Check directly below
+	//Wrap around if we overflow rows
 	if(cell_row + 1 < rows){
-		num_neighbors += grid[cell_row + 1][cell_col];
+		neighbor_row = cell_row + 1;
+	} else {
+		neighbor_row = 0;
 	}
 
+	//If we underflow cols, wrap around 
+	if(cell_col - 1 >= 0){
+		neighbor_col = cell_col - 1;
+	} else {
+		neighbor_col = cols - 1;
+	}
+
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//BELOW
+	//Check directly below, column the same
+	neighbor_col = cell_col;
+
+	//If we overflow rows
+	if(cell_row + 1 < rows){
+		neighbor_row = cell_row + 1;
+	} else {
+		neighbor_row = 0;
+	}
+
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
+
+	//BOTTOM RIGHT 
 	//Check to the bottom right
-	if(cell_row + 1 < rows && cell_col + 1 < cols){
-		num_neighbors += grid[cell_row + 1][cell_col + 1];
-	}	
+	//If we overflow rows we'll rap around
+	if(cell_row + 1 < rows){
+		neighbor_row = cell_row + 1;
+	} else {
+		neighbor_row = 0;
+	}
+
+	//Same for columns
+	if(cell_col + 1 < cols){
+		neighbor_col = cell_col + 1;
+	} else {
+		neighbor_col = 0;
+	}
+
+	//Again add what we have	
+	num_neighbors += grid[neighbor_row][neighbor_col];
 
 	return num_neighbors;
 }
