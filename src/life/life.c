@@ -112,7 +112,7 @@ static void _end_game(){
 	refresh();
 
 	//Let the user read it
-	sleep(2);
+	sleep(1);
 
 
 	//End ncurses mode and hard exit the program
@@ -164,7 +164,7 @@ static Grid* _get_random_start(const int rows, const int cols){
  * Everything in the game of life revolves around how many neighbors a cell has. Because of this, the number of neighbors
  * is the most critical part of our game
  */
-static int _num_neighbors(byte** grid, const int rows, const int cols, const int cell_row, const int cell_col){
+static int _num_living_neighbors(byte** grid, const int rows, const int cols, const int cell_row, const int cell_col){
 	int num_neighbors = 0;
 
 	/**
@@ -193,7 +193,30 @@ static int _num_neighbors(byte** grid, const int rows, const int cols, const int
 		num_neighbors += grid[cell_row - 1][cell_col + 1];
 	}
 
-	//TODO finish the rest of these
+	//Check directly to the left
+	if(cell_col - 1 >= 0){
+		num_neighbors += grid[cell_row][cell_col - 1];
+	}
+
+	//Check directly to the right
+	if(cell_col + 1 < cols){
+		num_neighbors += grid[cell_row][cell_col + 1];
+	}
+
+	//Check to the bottom left
+	if(cell_row + 1 < rows && cell_col - 1 >= 0){
+		num_neighbors += grid[cell_row + 1][cell_col - 1];
+	}
+
+	//Check directly below
+	if(cell_row + 1 < rows){
+		num_neighbors += grid[cell_row + 1][cell_col];
+	}
+
+	//Check to the bottom right
+	if(cell_row + 1 < rows && cell_col + 1 < cols){
+		num_neighbors += grid[cell_row + 1][cell_col + 1];
+	}	
 
 	return num_neighbors;
 }
@@ -202,18 +225,43 @@ static int _num_neighbors(byte** grid, const int rows, const int cols, const int
 static Grid* _next_tick(Grid* previous){
 	//Make a new grid
 	Grid* next_gen = _initialize_grid(previous->rows, previous->cols);
+	int num_living_neighbors;
 
-	int num_neighbors;
+	//Cycle through all of the cells
 	for(int i = 0; i < previous->rows; i++)	{
 		for(int j = 0; j < previous->cols; j++){
-			num_neighbors = _num_neighbors(previous->cells, previous->rows, previous->cols, i, j);	
+			//Count how many neighbors this cell has -- this drives everything in the game
+			num_living_neighbors = _num_living_neighbors(previous->cells, previous->rows, previous->cols, i, j);	
+	
+			/* Birth/dying logic based on number of neighbors */
+
+			//Any living cell with fewer than 2 live neighbors dies
+			if(previous->cells[i][j] == 1 && num_living_neighbors < 2){
+				next_gen->cells[i][j] = 0;
+
+			//Any living cell with 2 or 3 neighbors lives to the next generation
+			} else if(previous->cells[i][j] == 1 && (num_living_neighbors == 2 || num_living_neighbors == 3)){
+				next_gen->cells[i][j] = 1;
+
+			//Any living cell with more than 3 neighbors dies
+			} else if(previous->cells[i][j] == 1 && num_living_neighbors > 3){
+				next_gen->cells[i][j] = 0;
+
+			//Any dead cell with exactly 3 live neighbors comes to life
+			} else if(previous->cells[i][j] == 0 && num_living_neighbors == 3){
+				next_gen->cells[i][j] = 1;
+
+			} else {
+				//By default, all cells are dead
+				next_gen->cells[i][j] = 0;
+			}
 		}
 	}
 
-
-
 	//Free up all the memory of the previous grid
 	_teardown_grid(previous);
+
+	//Return a reference to the next grid
 	return next_gen;
 }
 
@@ -286,10 +334,11 @@ void run_game(){
 		_display_grid(current);
 
 		//Wait 1 second
-		sleep(1);
+		usleep(230000);
 		
 		//Get the next grid
 		current = _next_tick(current);
+
 		//Grab the user input
 		user_input = getch();
 		generation++;
