@@ -90,7 +90,7 @@ static void _print_welcome(){
 	refresh();
 
 	//Wait to let the user admire
-	sleep(2);
+	sleep(1);
 
 	//Center this nicely
 	move(46, COLS / 2 - 13);
@@ -363,26 +363,6 @@ static Grid* _next_tick(Grid* previous){
 void run_game(){	
 	//Initialize the screen into ncurses mode
 	initscr();
-
-	//If the terminal is the wrong size, we'll just quit and tell the user to retry
-	if(LINES < 52 || COLS < 224){
-		//Print a nice error
-		move(LINES / 2 - 3, 0);
-		printw("==============================================================================================================================\n");
-		printw("Display Error: Terminal Window must be at least 52 lines tall by 224 columns wide for proper display. Please resize and retry.\n");
-		printw("==============================================================================================================================\n\n");
-
-		//Flush the buffer so it displays
-		refresh();
-		
-		//Let the user read the error
-		sleep(5);
-
-		//End the ncurses session and exit with an error code
-		endwin();
-		exit(1);
-	}
-
 	//We will now save the rows and columns as constants
 	const int rows = LINES;
 	const int cols = COLS;
@@ -399,8 +379,28 @@ void run_game(){
 	//We just initialize this as null for right now
 	char user_input = '\0';
 
-	//Game startup mode, we only move forward once some key is pressed
-	_print_welcome();
+	//If the terminal is the wrong size, we'll just quit and tell the user to retry
+	if(LINES > 51 && COLS > 223){
+		_print_welcome();
+	} else {
+		move(LINES / 2, COLS / 2 - 6);
+		printw("Game of Life");
+
+		move(LINES / 2 + 1, COLS / 2 - 10);
+		printw("Author: Jack Robbins");
+	
+		refresh();
+
+		//Wait to let the user admire
+		sleep(1);
+
+
+		move(LINES / 2 + 5, COLS / 2 - 12);
+		printw("<Press any key to begin>");
+		refresh();
+
+		user_input = getch();
+	}
 
 	//Wipe the screen
 	clear();
