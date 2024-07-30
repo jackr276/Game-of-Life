@@ -12,7 +12,7 @@
  * This function will initialize a grid and return a reference to a heap allocated grid structure.
  * NOTE: It is the responbility of the recipient to free this memory
  */
-static Grid* _initialize_grid(const int rows, const int cols){
+static Grid* initialize_grid(const int rows, const int cols){
 	//Initialize space for the grid
 	Grid* generated = (Grid*)malloc(sizeof(Grid));
 
@@ -37,7 +37,7 @@ static Grid* _initialize_grid(const int rows, const int cols){
  * This is a simple function that will destroy a grid for us
  * NOTE: we use a double pointer here because we set this address to NULL.
  */
-static void _teardown_grid(Grid* grid){
+static void teardown_grid(Grid* grid){
 	//First we must teardown the internal 2D array
 	for(int i = 0; i < grid->rows; i++){
 		free(grid->cells[i]);
@@ -51,7 +51,7 @@ static void _teardown_grid(Grid* grid){
 }
 
 
-static void _print_welcome(){
+static void print_welcome(){
 	const char title[] = "                                                                                                                                                                                            \n\
                                                                                                                                                                                                                 \n\
 \t\t        GGGGGGGGGGGGG                                                                        OOOOOOOOO         ffffffffffffffff       LLLLLLLLLLL               iiii      ffffffffffffffff                      \n\
@@ -102,7 +102,7 @@ static void _print_welcome(){
 }
 
 
-static void _end_game(){
+static void end_game(){
 	//Wipe the screen clean
 	clear();
 	
@@ -121,7 +121,7 @@ static void _end_game(){
 }
 
 
-static void _display_grid(Grid* grid){
+static void display_grid(Grid* grid){
 	//Go through every cell
 	for(int i = 0; i < grid->rows; i++){
 		//Move the cursor down to be at the ith row
@@ -143,9 +143,9 @@ static void _display_grid(Grid* grid){
  * Get a random starting point. In theory, this should be pretty sparse with about less than half being
  * alive. This may be changed later
  */
-static Grid* _get_random_start(const int rows, const int cols){
+static Grid* get_random_start(const int rows, const int cols){
 	//Create a fresh grid
-	Grid* grid = _initialize_grid(rows, cols);
+	Grid* grid = initialize_grid(rows, cols);
 
 	//Randomly populate this grid
 	for(int i = 0; i < rows; i++){
@@ -164,7 +164,7 @@ static Grid* _get_random_start(const int rows, const int cols){
  * Everything in the game of life revolves around how many neighbors a cell has. Because of this, the number of neighbors
  * is the most critical part of our game
  */
-static int _num_living_neighbors(byte** grid, const int rows, const int cols, const int cell_row, const int cell_col){
+static int num_living_neighbors(byte** grid, const int rows, const int cols, const int cell_row, const int cell_col){
 	int num_neighbors = 0;
 	int neighbor_row;
 	int neighbor_col;
@@ -315,33 +315,33 @@ static int _num_living_neighbors(byte** grid, const int rows, const int cols, co
 }
 
 
-static Grid* _next_tick(Grid* previous){
+static Grid* next_tick(Grid* previous){
 	//Make a new grid
-	Grid* next_gen = _initialize_grid(previous->rows, previous->cols);
-	int num_living_neighbors;
+	Grid* next_gen = initialize_grid(previous->rows, previous->cols);
+	int count_living_neighbors;
 
 	//Cycle through all of the cells
 	for(int i = 0; i < previous->rows; i++)	{
 		for(int j = 0; j < previous->cols; j++){
 			//Count how many neighbors this cell has -- this drives everything in the game
-			num_living_neighbors = _num_living_neighbors(previous->cells, previous->rows, previous->cols, i, j);	
+			count_living_neighbors = num_living_neighbors(previous->cells, previous->rows, previous->cols, i, j);	
 	
 			/* Birth/dying logic based on number of neighbors */
 
 			//Any living cell with fewer than 2 live neighbors dies
-			if(previous->cells[i][j] == 1 && num_living_neighbors < 2){
+			if(previous->cells[i][j] == 1 && count_living_neighbors < 2){
 				next_gen->cells[i][j] = 0;
 
 			//Any living cell with 2 or 3 neighbors lives to the next generation
-			} else if(previous->cells[i][j] == 1 && (num_living_neighbors == 2 || num_living_neighbors == 3)){
+			} else if(previous->cells[i][j] == 1 && (count_living_neighbors == 2 || count_living_neighbors == 3)){
 				next_gen->cells[i][j] = 1;
 
 			//Any living cell with more than 3 neighbors dies
-			} else if(previous->cells[i][j] == 1 && num_living_neighbors > 3){
+			} else if(previous->cells[i][j] == 1 && count_living_neighbors > 3){
 				next_gen->cells[i][j] = 0;
 
 			//Any dead cell with exactly 3 live neighbors comes to life
-			} else if(previous->cells[i][j] == 0 && num_living_neighbors == 3){
+			} else if(previous->cells[i][j] == 0 && count_living_neighbors == 3){
 				next_gen->cells[i][j] = 1;
 
 			} else {
@@ -352,7 +352,7 @@ static Grid* _next_tick(Grid* previous){
 	}
 
 	//Free up all the memory of the previous grid
-	_teardown_grid(previous);
+	teardown_grid(previous);
 
 	//Return a reference to the next grid
 	return next_gen;
@@ -381,7 +381,7 @@ void run_game(){
 
 	//If the terminal is the wrong size, we'll just quit and tell the user to retry
 	if(LINES > 51 && COLS > 223){
-		_print_welcome();
+		print_welcome();
 	} else {
 		move(LINES / 2, COLS / 2 - 6);
 		printw("Game of Life");
@@ -418,19 +418,19 @@ void run_game(){
 	int generation = 1;
 	
 	//Initially the first grid is a random one
-	Grid* current = _get_random_start(rows, cols);
+	Grid* current = get_random_start(rows, cols);
 	
 	//Main game loop, while the user lets it go, we will run forever
 	//Idea of the main loop: Display -> wait -> get next & repeat
 	while(user_input != 'q'){
 		//Display the grid
-		_display_grid(current);
+		display_grid(current);
 
 		//Wait 1 second
 		usleep(230000);
 		
 		//Get the next grid
-		current = _next_tick(current);
+		current = next_tick(current);
 
 		//Grab the user input
 		user_input = getch();
@@ -438,5 +438,5 @@ void run_game(){
 	}
 	
 	//If we get here, we know that it is time to terminate our game method
-	_end_game();
+	end_game();
 }
