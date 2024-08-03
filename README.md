@@ -17,8 +17,8 @@ With these simple rules, a game board can come to life with as long as there is 
 ## Running this Program
 To run this program, first clone the repository and navigate to the directory that it downloaded under. For your convenience, a [runner script](https://github.com/jackr276/Game-of-Life/blob/main/run.sh) has been provided for compiling/running the program. All you must do is run the following commands:
 ```console
-example@bash: ~/Arithmetic-Expression-Evaluator $ chmod +x run.sh
-example@bash: ~/Arithmetic-Expression-Evaluator $ ./run.sh
+example@bash: ~/Game-of-Life $ chmod +x run.sh
+example@bash: ~/Game-of-Life $ ./run.sh
 ```
 It is important to note that upon running the final command, your screen will enter '`ncurses`' mode, meaning that there is no typing or <CTRL-C> exit ability. The program will first display the welcome screen shown above, or this welcome screen if your terminal window is too small:   
 
