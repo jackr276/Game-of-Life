@@ -8,6 +8,7 @@
 
 #include "life.h"
 
+
 /**
  * This function will initialize a grid and return a reference to a heap allocated grid structure.
  * NOTE: It is the responbility of the recipient to free this memory
@@ -51,6 +52,9 @@ static void teardown_grid(Grid* grid){
 }
 
 
+/**
+ *  A simple helper method that prints the welcome message to the screen
+ */
 static void print_welcome(){
 	const char title[] = "                                                                                                                                                                                            \n\
                                                                                                                                                                                                                 \n\
@@ -97,11 +101,15 @@ static void print_welcome(){
 	printw("<Press any key to continue>\n");
 	refresh();
 
+	//Block until we grab the keypress
 	getch();
 
 }
 
 
+/**
+ * An end game method that terminates the screen and provides a hard exit for us
+ */
 static void end_game(){
 	//Wipe the screen clean
 	clear();
@@ -315,6 +323,10 @@ static int num_living_neighbors(byte** grid, const int rows, const int cols, con
 }
 
 
+/**
+ * The next tick function generates an entire new successor grid based on the current grid
+ * For ownership reasons, the previous Grid is tore-down in this function
+ */
 static Grid* next_tick(Grid* previous){
 	//Make a new grid
 	Grid* next_gen = initialize_grid(previous->rows, previous->cols);
@@ -359,7 +371,9 @@ static Grid* next_tick(Grid* previous){
 }
 
 
-
+/**
+ * The main runner method for the entire game
+ */
 void run_game(){	
 	//Initialize the screen into ncurses mode
 	initscr();
@@ -414,7 +428,7 @@ void run_game(){
 	//Refresh user input in the rare event they entered 'q' first
 	user_input = '\0';	
 
-	//We will keep track of the "generations of the game"
+	//We will keep track of the "generations" of the game
 	int generation = 1;
 	
 	//Initially the first grid is a random one
